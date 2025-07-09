@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS5K Race Info Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00f2c2 0%, #00d4aa 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="80" r="3" fill="white" opacity="0.1"/><circle cx="40" cy="60" r="1" fill="white" opacity="0.1"/><circle cx="60" cy="30" r="2" fill="white" opacity="0.1"/></svg>');
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #00f2c2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .event-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 242, 194, 0.1);
+        }
+
+        .detail-card strong {
+            color: #00f2c2;
+            font-weight: 600;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .schedule-table th {
+            background: #00f2c2;
+            color: white;
+            font-weight: 600;
+        }
+
+        .schedule-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #00f2c2, #00d4aa);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .transport-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .transport-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transport-icon {
+            width: 30px;
+            height: 30px;
+            background: #00f2c2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #f39c12;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: #00f2c2;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px 10px 10px 0;
+            transition: background 0.2s ease;
+        }
+
+        .link-button:hover {
+            background: #00d4aa;
+            color: white;
+        }
+
+        .course-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .course-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .course-info li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .course-info li::before {
+            content: '•';
+            color: #00f2c2;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .faq-category {
+            margin-bottom: 30px;
+        }
+
+        .faq-category-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 2px solid #00f2c2;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .faq-question {
+            background: #00f2c2;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .faq-question:hover {
+            background: #00d4aa;
+        }
+
+        .faq-answer {
+            padding: 15px 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .faq-answer strong {
+            color: #00f2c2;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .event-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-table {
+                font-size: 0.9em;
+            }
+            
+            .schedule-table th,
+            .schedule-table td {
+                padding: 10px;
+            }
+
+            .faq-question {
+                padding: 12px 15px;
+                font-size: 0.9em;
+            }
+
+            .faq-answer {
+                padding: 12px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>JS5K Race Info Hub 🏃‍♀️</h1>
+            <p>Everything you need to know for Monday 11th August in Battersea Park</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">🗓️ Key Event Details</h2>
+                <div class="event-details">
+                    <div class="detail-card">
+                        <strong>Date:</strong> Monday 11th August<br>
+                        <strong>Venue:</strong> Battersea Park
+                    </div>
+                    <div class="detail-card">
+                        <strong>Arrive from:</strong> 6:00pm<br>
+                        <strong>Race groups run from:</strong> 6:30pm to 7:15pm
+                    </div>
+                    <div class="detail-card">
+                        <strong>Hospitality:</strong> 6:45–10:00pm @ Bowling Green Pavilion<br>
+                        <strong>After-party:</strong> Pub booking from 10:00pm — 12:00am at Masons Arms (6 min walk)
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">⏱️ Runner Group Schedule</h2>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Group</th>
+                            <th>Arrive By</th>
+                            <th>Start Line</th>
+                            <th>Race Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>17:50–18:00</td>
+                            <td>18:20</td>
+                            <td>18:30</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>18:05–18:15</td>
+                            <td>18:35</td>
+                            <td>18:45</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>18:20–18:30</td>
+                            <td>18:50</td>
+                            <td>19:00</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>18:35–18:45</td>
+                            <td>19:05</td>
+                            <td>19:15</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="highlight-box">
+                    📌 Arrive <strong>30–40 mins before</strong> your race time to allow for check-in and bib pickup.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📍 Getting There</h2>
+                <div class="info-box">
+                    <strong>Entrance:</strong> Rosery Gate, Battersea Park<br>
+                    <strong>Head to:</strong> Bowling Green Pavilion for bag drop, registration + start line meet-up
+                </div>
+                
+                <h3 style="margin: 20px 0 15px 0; color: #2c3e50;">Closest Stations:</h3>
+                <div class="transport-list">
+                    <div class="transport-item">
+                        <div class="transport-icon">🚇</div>
+                        <div>
+                            <strong>Tube:</strong> Battersea Power Station (Northern Line)
+                        </div>
+                    </div>
+                    <div class="transport-item">
+                        <div class="transport-icon">🚆</div>
+                        <div>
+                            <strong>Train:</strong> Battersea Park or Queenstown Road
+                        </div>
+                    </div>
+                    <div class="transport-item">
+                        <div class="transport-icon">🚌</div>
+                        <div>
+                            <strong>Bus:</strong> 44, N44, 344, 436, 452
+                        </div>
+                    </div>
+                    <div class="transport-item">
+                        <div class="transport-icon">🚲</div>
+                        <div>
+                            <strong>Bike:</strong> Cycle racks + Santander docking nearby
+                        </div>
+                    </div>
+                    <div class="transport-item">
+                        <div class="transport-icon">🛥️</div>
+                        <div>
+                            <strong>River:</strong> Thames Clipper to Battersea Power Station Pier
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="#" class="link-button">📱 Plan your route with Google Maps</a>
+                <a href="#" class="link-button">🗺️ View park map + race route here</a>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🎽 Race Bibs + Safety Info</h2>
+                <div class="course-info">
+                    <ul>
+                        <li>Your <strong>race bib</strong> is your ID + chip timer. Pin it on the <strong>front</strong> of your shirt.</li>
+                        <li>Fill in your <strong>emergency info on the back</strong> — this is required.</li>
+                        <li>Didn't receive your bib early? No worries — collect it at check-in.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🚨 On the Course</h2>
+                <div class="course-info">
+                    <ul>
+                        <li>5km course = <strong>two laps</strong> of 2.5km</li>
+                        <li>Mixed terrain: tarmac + grass</li>
+                        <li><strong>Follow marshal instructions</strong> especially near the Bandstand (it gets tight)</li>
+                        <li><strong>Move away from the finish line</strong> quickly after your run</li>
+                        <li>Results will be live at: Race Timing Solutions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🎒 Bag Drop</h2>
+                <div class="warning-box">
+                    Located at the <strong>Bowling Green Pavilion</strong><br>
+                    Please pack light — space is limited. If you can, bring a friend to watch your bag!
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🧃 Hospitality</h2>
+                <div class="info-box">
+                    Post-run hangout from <strong>6:45–10pm</strong> in the Bowling Green Pavilion. Expect food, drinks and startup chat. After 10pm? Walk with us to the <strong>Masons Arms</strong> for a final toast.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🙋‍♀️ FAQ Section</h2>
+                
+                <div class="faq-category">
+                    <h3 class="faq-category-title">On the day:</h3>
+                    <div class="faq-item">
+                        <div class="faq-question">When should I arrive?</div>
+                        <div class="faq-answer">
+                            Arrival is from 6:00pm - you will be allocated a registration time, please check your emails! IF you have not received an email with your registration time, please arrive to check-in at the Bowling Green for 6pm! For more information on the schedule, take a look at our events page here.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">What happens if I arrive late?</div>
+                        <div class="faq-answer">
+                            The course will close at 8pm. We recommend arriving at least 45 minutes early.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Where does the race start and finish?</div>
+                        <div class="faq-answer">
+                            The race will start [insert location] and end [insert location]. Save this map for reference, and there will be signs and staff to guide you on the spot too - don't worry!
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">What if I'm unable to attend the race?</div>
+                        <div class="faq-answer">
+                            All race entries are non-refundable. Only those registered to run are permitted to take part in the race.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Will the race go ahead if it's very hot or raining?</div>
+                        <div class="faq-answer">
+                            Yes! Come rain or shine, the event will be going ahead. If an extreme weather event occurs on race day, we will alert participants of plans as soon as possible.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Are dogs allowed in the event site?</div>
+                        <div class="faq-answer">
+                            Due to the scale of the event - unfortunately not!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h3 class="faq-category-title">Race & Bibs</h3>
+                    <div class="faq-item">
+                        <div class="faq-question">Do I have to wear a bib?</div>
+                        <div class="faq-answer">
+                            Yes — it's your race number and your access pass.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">How will I receive my bib?</div>
+                        <div class="faq-answer">
+                            You will receive the bib [insert approximate time] in advance via post.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">What do I do if I haven't received my bib via post?</div>
+                        <div class="faq-answer">
+                            DO NOT WORRY! You can pick up a bib at our check-in desk at [location] from [time] when you arrive. Please have time confirmation email ready and we'll sort it out.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h3 class="faq-category-title">Logistics</h3>
+                    <div class="faq-item">
+                        <div class="faq-question">Will you have a Bag Drop?</div>
+                        <div class="faq-answer">
+                            There will be a small bag drop at the event but we expect this to be very busy so please avoid bringing bags if possible or bring a spectator to watch bags!
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Is water provided?</div>
+                        <div class="faq-answer">
+                            There are water fountains in the park, and bottled water with paper cups will be available. But we strongly advise you to bring your water as well!
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Are food and drinks available?</div>
+                        <div class="faq-answer">
+                            Yes, we'll have amazing food & beverage vendors around onsite to fuel everyone (whether you run or not)!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h3 class="faq-category-title">Race Results:</h3>
+                    <div class="faq-item">
+                        <div class="faq-question">When will I receive my event results?</div>
+                        <div class="faq-answer">
+                            As soon as you cross the line! All results will be uploaded on this website HERE
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Who can I contact if I have a query about my results?</div>
+                        <div class="faq-answer">
+                            If you feel there is a discrepancy in the results, please contact our race timing team at <strong>ben@racetimingsolutions.com</strong> with your full name + bib number. We will look into this and get back to you.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
