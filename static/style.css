@@ -507,7 +507,7 @@ margin-top: 20px;
 }
 
 .footer-links a {
-color: var(--accent);
+color: var(--text-main);
 text-decoration: none;
 margin: 0 15px;
 font-weight: 500;
