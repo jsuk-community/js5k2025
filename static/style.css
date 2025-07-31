@@ -213,6 +213,51 @@ background: #f8f9fa;
 border-bottom: none;
 }
 
+ .table-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin: 20px 0;
+        }
+        .team-schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        .team-schedule-table th,
+        .team-schedule-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .team-schedule-table th {
+            background: #00f2c2;
+            color: black;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        .team-schedule-table tr:hover {
+            background: #f8f9fa;
+        }
+        .team-schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+        .wave-1 { background-color: #fff5f5; }
+        .wave-2 { background-color: #f0fff4; }
+        .wave-3 { background-color: #f0f8ff; }
+        .wave-4 { background-color: #fffaf0; }
+        .search-box {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 300px;
+            font-size: 16px;
+        }
+
+
 .highlight-box {
 background: #00f2c2;
 color: black;
